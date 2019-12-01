@@ -1,15 +1,10 @@
 // Given the following CSV file called "mammals.csv"
 // located in the project's "assets" folder:
-//
-// id,species,name
-// 0,Capra hircus,Goat
-// 1,Panthera pardus,Leopard
-// 2,Equus zebra,Zebra
 
 let table;
-let bars = [];
 let header;
-let numbers = [];
+let bars = [];
+let selectedBar = undefined;
 
 function preload() {
   print("Hello there");
@@ -41,13 +36,13 @@ function setup() {
     let bar = new Bar(data);
     bars[r - 1] = bar;
   }
-  print(`Total of ${bars.length}`);
+
   bars.sort(function (a, b) {
     let av = a.value;
     let bv = b.value;
     return bv - av;
   });
-  print(bars);
+
   bars.forEach(bar => {
     let factor = bar.value / bars[0].value;
     bar.length = factor * 1;
@@ -60,7 +55,32 @@ function draw() {
   fill(200, 250, 150, 100);
   ellipse(mouseX, mouseY, 30, 30);
   for (let i = 0; i < bars.length; i++) {
-    bars[i].display(20, i * 4 + 20);
+    let bar = bars[i];
+    if (!bar.selected) {
+      stroke(10);
+      strokeWeight(1);
+      bars[i].display(20, i * 4 + 20);
+    } else {
+      strokeWeight(15)
+      stroke(200, 100, 100);
+      line(20, i * 4 + 20, 100, i * 4 + 20);
+    }
+  }
+}
+
+function mouseMoved() {
+  for (let i = 0; i < bars.length; i++) {
+    let bar = bars[i];
+    let barPos = i * 4 + 20;
+    if (mouseY < barPos + 2 && mouseY > barPos - 2) {
+      bar.updateHeight(30)
+      bar.scaleFactor = 1.2;
+      bar.selected = true;
+    } else {
+      bar.updateHeight(2)
+      bar.scaleFactor = 1.0;
+      bar.selected = false;
+    }
   }
 }
 
@@ -69,17 +89,25 @@ class Bar {
     this.data = data;
     this.selectValue(0);
     this.length = 20;
+    this.height = 2;
+    this.selected = false;
+    this.scaleFactor = 1;
   }
 
   selectValue(n) {
     this.value = this.data[n];
   }
 
+  updateHeight(h) {
+    this.height = h;
+  }
+
   display(x, y) {
+    let size = this.length * this.scaleFactor;
     push();
     translate(x, y);
     rectMode(CORNER);
-    rect(0, 0, 200 * this.length, 3);
+    rect(0, 0, 200 * size, this.height);
     pop();
   }
 
