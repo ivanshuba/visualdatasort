@@ -61,8 +61,10 @@ function draw() {
     } else {
       push();
       strokeWeight(15);
-      stroke(200, 100, 100);
-      line(20, i * 4 + 20, 100, i * 4 + 20);
+      stroke(200, 100, 100, 100);
+      let size = bars[i].length * bars[i].scaleFactor * Bar.DEFAULT_LENGTH;
+      translate(20, i * 4 + 21);
+      line(0, 0, size, 0);
       pop();
     }
   }
@@ -73,18 +75,15 @@ function mouseMoved() {
     let bar = bars[i];
     let barPos = i * 4 + 20;
     if (mouseY < barPos + 2 && mouseY > barPos - 2) {
-      bar.updateHeight(30);
-      bar.scaleFactor = 1.2;
       bar.selected = true;
     } else {
-      bar.updateHeight(2);
-      bar.scaleFactor = 1.0;
       bar.selected = false;
     }
   }
 }
 
 class Bar {
+  static DEFAULT_LENGTH = 200;
   constructor(data) {
     this.data = data;
     this.selectValue(0);
@@ -98,10 +97,6 @@ class Bar {
     this.value = this.data[n];
   }
 
-  updateHeight(h) {
-    this.height = h;
-  }
-
   display(x, y) {
     let size = this.length * this.scaleFactor;
     push();
@@ -109,7 +104,7 @@ class Bar {
     strokeWeight(1);
     stroke(10);
     rectMode(CORNER);
-    rect(0, 0, 200 * size, this.height);
+    rect(0, 0, Bar.DEFAULT_LENGTH * size, this.height);
     pop();
   }
 }
